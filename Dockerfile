@@ -3,7 +3,7 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-ENV HOME=/app
+ENV HOME=/app \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -24,7 +24,7 @@ FROM python:3.11-slim AS runtime
 
 WORKDIR /app
 
-ENV HOME=/app
+ENV HOME=/app \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000
