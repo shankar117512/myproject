@@ -31,3 +31,8 @@ class HealthCheckTestCase(TestCase):
         """Admin URL must be accessible (redirect to login)."""
         response = self.client.get("/admin/")
         self.assertIn(response.status_code, [200, 301, 302])
+
+    def test_home(client):
+        url = reverse("home")  # example
+        response = client.get(url)
+        assert response.status_code == 200
