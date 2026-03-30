@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['easygoing-analysis-dev.up.railway.app']
+ALLOWED_HOSTS = ['easygoing-analysis-dev.up.railway.app','localhost','127.0.0.1',]
 
 CSRF_TRUSTED_ORIGINS = ['https://easygoing-analysis-dev.up.railway.app']
 
