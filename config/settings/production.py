@@ -1,4 +1,4 @@
-from .base import *
+from .base import DATABASES
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
