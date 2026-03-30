@@ -3,7 +3,8 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ENV HOME=/app
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
@@ -23,7 +24,8 @@ FROM python:3.11-slim AS runtime
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ENV HOME=/app
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000
 
@@ -37,10 +39,11 @@ COPY . .
 
 RUN python manage.py collectstatic --noinput --settings=config.settings.production 2>/dev/null || true
 
+RUN mkdir -p /app && chmod -R 755 /app
 RUN addgroup --system app && adduser --system --group app
 RUN chown -R app:app /app
 USER app
 
 EXPOSE $PORT
 
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --worker-tmp-dir /tmp --timeout 120"]
