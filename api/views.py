@@ -16,9 +16,12 @@ class HealthCheckView(View):
         except Exception as e:
             db_status = f"unhealthy: {str(e)}"
 
-        return JsonResponse({
-            "status": "ok" if db_status == "healthy" else "error",
-            "database": db_status,
-            "django_version": django.get_version(),
-            "environment": "operational",
-        }, status=200 if db_status == "healthy" else 503)
+        return JsonResponse(
+            {
+                "status": "ok" if db_status == "healthy" else "error",
+                "database": db_status,
+                "django_version": django.get_version(),
+                "environment": "operational",
+            },
+            status=200 if db_status == "healthy" else 503,
+        )

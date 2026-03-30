@@ -2,27 +2,30 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['easygoing-analysis-dev.up.railway.app','localhost','127.0.0.1',]
+ALLOWED_HOSTS = [
+    "easygoing-analysis-dev.up.railway.app",
+    "localhost",
+    "127.0.0.1",
+]
 
-CSRF_TRUSTED_ORIGINS = ['https://easygoing-analysis-dev.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-dev.up.railway.app"]
 
-INSTALLED_APPS += ['debug_toolbar']
+INSTALLED_APPS += ["debug_toolbar"]
 
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ["127.0.0.1"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler'},
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
 }
-

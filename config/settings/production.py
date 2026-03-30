@@ -5,43 +5,42 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['.railway.app', config('PRODUCTION_DOMAIN', default='yourdomain.com')]
+ALLOWED_HOSTS = [".railway.app", config("PRODUCTION_DOMAIN", default="yourdomain.com")]
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
-SENTRY_DSN = config('SENTRY_DSN', default='')
+SENTRY_DSN = config("SENTRY_DSN", default="")
 if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        environment='production',
+        environment="production",
         traces_sample_rate=0.1,
     )
 
 CORS_ALLOWED_ORIGINS = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='https://yourdomain.com',
-    cast=lambda v: [s.strip() for s in v.split(',')]
+    "CORS_ALLOWED_ORIGINS",
+    default="https://yourdomain.com",
+    cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler'},
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
     },
 }
-
