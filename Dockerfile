@@ -46,4 +46,4 @@ USER app
 
 EXPOSE $PORT
 
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --worker-tmp-dir /tmp --timeout 120"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --worker-tmp-dir /tmp --timeout 120"]
