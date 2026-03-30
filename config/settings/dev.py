@@ -2,7 +2,9 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '.railway.app']
+ALLOWED_HOSTS = ['easygoing-analysis-dev.up.railway.app']
+
+CSRF_TRUSTED_ORIGINS = ['https://easygoing-analysis-dev.up.railway.app']
 
 INSTALLED_APPS += ['debug_toolbar']
 
