@@ -1,4 +1,5 @@
 [flake8]
 max-line-length = 120
-exclude = venv,migrations
-ignore = F403,F405
+exclude = venv, migrations
+per-file-ignores =
+    config/settings/*.py: F401, F403, F405

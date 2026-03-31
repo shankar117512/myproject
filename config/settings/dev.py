@@ -1,4 +1,10 @@
-from .base import *
+import sys, os
+
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+
+from config.settings.base import *
 
 DEBUG = True
 
@@ -10,13 +16,17 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-dev.up.railway.app"]
 
-INSTALLED_APPS += ["debug_toolbar"]
+INSTALLED_APPS += [  # noqa: F405
+    "debug_toolbar",
+]
 
-MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+MIDDLEWARE += [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # noqa: F405
+]
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-DATABASES["default"]["OPTIONS"] = {"sslmode": "disable"}
+DATABASES  # noqa: F405 ["default"]["OPTIONS"] = {"sslmode": "disable"}
 
 CORS_ALLOW_ALL_ORIGINS = True
 
