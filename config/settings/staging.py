@@ -1,7 +1,8 @@
-from .base import DATABASES
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
+from sentry_sdk.integrations.django import DjangoIntegration
+
+from .base import DATABASES
 
 DEBUG = False
 
