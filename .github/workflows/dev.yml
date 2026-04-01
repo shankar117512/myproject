@@ -127,13 +127,13 @@ jobs:
           railway environment dev
           railway up --service easygoing-analysis --detach
 
-      - name: Wait and Check Status
+      - name: Wait and Check Deployment Status 
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           echo "Waiting for deployment to stabilize..."
           sleep 30
-          railway status
+          railway status --service easygoing-analysis
 
       - name: Notify Success
         run: echo "✅ Dev deployment successful — Commit ${{ github.sha }}"
