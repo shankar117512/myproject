@@ -25,5 +25,5 @@ def trigger_error(request):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("sentry-debug/", trigger_error),
-    path("", include("core.urls")),  # 👈 IMPORTANT
+    path("", include("api.urls")),  # 👈 IMPORTANT
 ]
