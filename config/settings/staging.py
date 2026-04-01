@@ -4,9 +4,11 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [".railway.app", config("RAILWAY_STATIC_URL", default="*")]
+ALLOWED_HOSTS = ["easygoing-analysis-staging.up.railway.app"]
+
+CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-staging.up.railway.app"]
 
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
