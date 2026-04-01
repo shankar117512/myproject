@@ -17,8 +17,9 @@ SENTRY_DSN = os.getenv("SENTRY_DSN")
 
 if SENTRY_DSN:  # ✅ Only initialize if exists
     sentry_sdk.init(
-        dsn=SENTRY_DSN,
+        dsn="https://bb4d49e6fe255d9b746a6afca468792f@o4511145511944192.ingest.us.sentry.io/4511145515876352",
         traces_sample_rate=1.0,
+        send_default_pii=True,
     )
 
 CORS_ALLOWED_ORIGINS = config(
