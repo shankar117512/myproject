@@ -32,7 +32,7 @@ class HealthCheckTestCase(TestCase):
         response = self.client.get("/admin/")
         self.assertIn(response.status_code, [200, 301, 302])
 
-    def test_home(client):
-        url = reverse("home")  # example
-        response = client.get(url)
-        assert response.status_code == 200
+    def test_home(self):
+        url = "/"  # or use reverse()
+        response = self.client.get(url)  # ✅ CORRECT
+        self.assertEqual(response.status_code, 200)
