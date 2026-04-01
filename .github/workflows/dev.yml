@@ -133,7 +133,7 @@ jobs:
         run: |
           echo "Waiting for deployment to stabilize..."
           sleep 30
-          railway status --service easygoing-analysis
+          railway status
 
       - name: Notify Success
         run: echo "✅ Dev deployment successful — Commit ${{ github.sha }}"
