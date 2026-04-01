@@ -125,7 +125,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           railway environment dev
-          railway up --detach
+          railway up --service easygoing-analysis --detach
 
       - name: Verify Deployment Health
         env:
