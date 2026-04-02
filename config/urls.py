@@ -33,5 +33,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health_check),
     path("sentry-debug/", trigger_error),
-    path("", include("api.urls")),  # 👈 IMPORTANT
+    path("api/", include("api.urls")),
 ]
