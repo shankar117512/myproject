@@ -6,7 +6,7 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["easygoing-analysis-staging.up.railway.app"]
+ALLOWED_HOSTS = ["easygoing-analysis-staging.up.railway.app", "healthcheck.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-staging.up.railway.app"]
 
