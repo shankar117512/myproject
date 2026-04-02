@@ -1,0 +1,163 @@
+name: Staging CI/CD Pipeline
+
+on:
+  push:
+    branches: [staging]
+  pull_request:
+    branches: [staging]
+
+env:
+  PYTHON_VERSION: '3.11'
+  DJANGO_SETTINGS_MODULE: config.settings.staging
+
+jobs:
+  # ─── Full Test Suite ─────────────────────────────────────────────────────
+  test:
+    name: Run Full Test Suite
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_staging_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: pip install -r requirements/staging.txt
+
+      - name: Install Test Dependencies
+        run: pip install pytest pytest-django coverage factory-boy
+
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_staging_db
+          SECRET_KEY: test-staging-secret-key
+        run: python manage.py migrate --settings=config.settings.staging
+
+      - name: Run Tests with High Coverage Requirement
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_staging_db
+          SECRET_KEY: test-staging-secret-key
+          DJANGO_SETTINGS_MODULE: config.settings.staging
+        run: |
+          coverage run -m pytest --tb=short -v --junit-xml=test-results.xml
+          coverage report --fail-under=80
+          coverage xml
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-staging
+          path: test-results.xml
+
+  # ─── Security Scan ───────────────────────────────────────────────────────
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Safety
+        run: pip install safety bandit
+
+      - name: Run Safety Check (Dependency Vulnerabilities)
+        run: safety check -r requirements/staging.txt
+
+      - name: Run Bandit (Code Security)
+        run: bandit -r . -x venv,tests,migrations --severity-level medium
+
+  # ─── Docker Build & Push ─────────────────────────────────────────────────
+  docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t myproject:staging-${{ github.sha }} .
+          docker tag myproject:staging-${{ github.sha }} myproject:staging-latest
+
+  # ─── Deploy to Staging ───────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Railway Staging
+    runs-on: ubuntu-latest
+    needs: [docker]
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Record Pre-Deploy Commit (For Rollback)
+        id: pre_deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          npm install -g @railway/cli
+          PREVIOUS_DEPLOYMENT=$(railway deployments list --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} --json | jq -r '.[0].id' 2>/dev/null || echo "none")
+          echo "previous_deployment=$PREVIOUS_DEPLOYMENT" >> $GITHUB_OUTPUT
+          echo "Previous deployment ID: $PREVIOUS_DEPLOYMENT"
+
+      - name: Deploy to Railway Staging
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway environment use staging
+          railway up --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} --detach
+
+      - name: Wait for Deployment
+        run: sleep 60
+
+      - name: Run Post-Deploy Smoke Tests
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          STAGING_URL=$(railway variables get RAILWAY_STATIC_URL --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} 2>/dev/null || echo "")
+          if [ -n "$STAGING_URL" ]; then
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://$STAGING_URL/health/")
+            echo "Health check returned: $HTTP_STATUS"
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "❌ Smoke test failed. Initiating rollback..."
+              exit 1
+            fi
+          fi
+          echo "✅ Smoke tests passed"
+
+      - name: Rollback on Failure
+        if: failure() && steps.pre_deploy.outputs.previous_deployment != 'none'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "🔄 Rolling back to: ${{ steps.pre_deploy.outputs.previous_deployment }}"
+          railway deployments rollback ${{ steps.pre_deploy.outputs.previous_deployment }} --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }}
+          echo "✅ Rollback completed"
