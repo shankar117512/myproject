@@ -24,7 +24,7 @@ FROM python:3.11-slim AS runtime
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
+    PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     libpq5 \
