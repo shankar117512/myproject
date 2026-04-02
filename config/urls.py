@@ -17,16 +17,7 @@ Including another URLconf
 from django.http import HttpResponse
 from django.contrib import admin
 from django.urls import path, include
-from .views import health_check
-
-
-def home(request):
-    return HttpResponse("Django Staging was Deployed Successfully...! 🚀")
-
-
-def trigger_error(request):
-    division_by_zero = 1 / 0
-
+from config.views import home, health_check
 
 urlpatterns = [
     path("", home),
