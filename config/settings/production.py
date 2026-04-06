@@ -1,11 +1,13 @@
 from .base import *
+import os
+import dj_database_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['easygoing-analysis-production.up.railway.app', config('PRODUCTION_DOMAIN', default='yourdomain.com')]
+ALLOWED_HOSTS = ["easygoing-analysis-production.up.railway.app", "healthcheck.railway.app"]
 CSRF_TRUSTED_ORIGINS = ['https://easygoing-analysis-production.up.railway.app']
 
 SECURE_BROWSER_XSS_FILTER = True
@@ -17,12 +19,19 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+DATABASES = {
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=False,  # 👈 IMPORTANT FIX
+    )
+}
+
 
 SENTRY_DSN = config('SENTRY_DSN', default='')
 if SENTRY_DSN:
     sentry_sdk.init(
-        dsn=SENTRY_DSN,
+        dsn="https://bb4d49e6fe255d9b746a6afca468792f@o4511145511944192.ingest.us.sentry.io/4511145515876352",
         integrations=[DjangoIntegration()],
         environment='production',
         traces_sample_rate=0.1,
