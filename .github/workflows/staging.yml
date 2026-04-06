@@ -81,8 +81,8 @@ jobs:
       - name: Install Safety
         run: pip install safety bandit
 
-      - name: Run Safety Scan (Dependency Vulnerabilities)
-        run: safety scan -r requirements/staging.txt
+      - name: Run Safety Check (Dependency Vulnerabilities)
+        run: safety check -r requirements/staging.txt
 
       - name: Run Bandit (Code Security)
         run: bandit -r . -x venv,tests,migrations --severity-level medium
