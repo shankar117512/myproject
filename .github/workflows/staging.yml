@@ -81,8 +81,8 @@ jobs:
       - name: Install Safety
         run: pip install safety bandit
 
-      - name: Run Safety Check (Dependency Vulnerabilities)
-        run: safety check -r requirements/staging.txt
+      - name: Run Safety Scan (Dependency Vulnerabilities)
+        run: safety scan -r requirements/staging.txt
 
       - name: Run Bandit (Code Security)
         run: bandit -r . -x venv,tests,migrations --severity-level medium
@@ -132,7 +132,7 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway environment use staging
+          railway environment staging
           railway up --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} --detach
 
       - name: Wait for Deployment
