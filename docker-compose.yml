@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-myproject}
+      - DATABASE_URL=postgresql://postgres:CNdgXtfbxvTJZRPGYLtqaIYOKaXLWIAu@gondola.proxy.rlwy.net:26358/railway
       - DJANGO_SETTINGS_MODULE=config.settings.production
     depends_on:
       db:

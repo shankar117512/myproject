@@ -5,7 +5,8 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['.railway.app', config('PRODUCTION_DOMAIN', default='yourdomain.com')]
+ALLOWED_HOSTS = ['easygoing-analysis-production.up.railway.app', config('PRODUCTION_DOMAIN', default='yourdomain.com')]
+CSRF_TRUSTED_ORIGINS = ['https://easygoing-analysis-production.up.railway.app']
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = True
@@ -44,4 +45,3 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
-
