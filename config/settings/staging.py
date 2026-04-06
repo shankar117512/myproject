@@ -1,5 +1,6 @@
 from .base import *
 import os
+import dj_database_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
@@ -13,7 +14,13 @@ CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-staging.up.railway.app"]
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 
-DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+DATABASES = {
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=False,  # 👈 IMPORTANT FIX
+    )
+}
 
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 
