@@ -25,9 +25,9 @@ SECRET_KEY = 'django-insecure-%081+x=xd=4$l*$3f51$u1w$&1g^w(@lbe)v4fq(2fp=)9(xhm
 SECRET_KEY = config('SECRET_KEY', default='change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['easygoing-analysis-production.up.railway.app', 'healthcheck.railway.app']
 
 
 # Application definition
