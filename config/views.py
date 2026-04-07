@@ -3,7 +3,7 @@ from django.http import JsonResponse
 
 
 def home(request):
-    return HttpResponse("Django staging deployed successfully...! 🚀")
+    return HttpResponse("Django Production Was Deployed Successfully...! 🚀")
 
 
 def health_check(request):
