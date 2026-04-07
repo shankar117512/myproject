@@ -1,0 +1,210 @@
+name: Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [main1]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if tests warn'
+        required: false
+        default: 'false'
+
+env:
+  PYTHON_VERSION: '3.11'
+  DJANGO_SETTINGS_MODULE: config.settings.production
+
+jobs:
+  # ─── Comprehensive Test Suite ────────────────────────────────────────────
+  test:
+    name: Full Production Test Suite
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_prod_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install All Dependencies
+        run: |
+          pip install -r requirements/production.txt
+          pip install pytest pytest-django coverage factory-boy
+
+      - name: Run Migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_prod_db
+          SECRET_KEY: test-production-secret-key
+        run: python manage.py migrate
+
+      - name: Run Full Test Suite (90% Coverage Required)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_prod_db
+          SECRET_KEY: test-production-secret-key
+        run: |
+          coverage run -m pytest --tb=short -v --junit-xml=test-results.xml
+          coverage report --fail-under=90
+          coverage xml
+
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-production
+          path: |
+            test-results.xml
+            coverage.xml
+
+  # ─── Security & Compliance ───────────────────────────────────────────────
+  security:
+    name: Security Scans
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Security Tools
+        run: pip install safety bandit
+
+      - name: Dependency Vulnerability Scan
+        run: safety check -r requirements/production.txt
+
+      - name: Static Code Security Analysis
+        run: bandit -r . -x venv,tests,migrations --severity-level medium -f json -o bandit-report.json
+
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-report
+          path: bandit-report.json
+
+  # ─── Docker Build Verification ───────────────────────────────────────────
+  docker-verify:
+    name: Docker Build Verification
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Test Docker Image
+        run: |
+          docker build -t myproject:production-${{ github.sha }} .
+          docker run --rm myproject:production-${{ github.sha }} python -c "import django; print('Django OK')"
+
+  # ─── Record Pre-Deploy State ─────────────────────────────────────────────
+  pre-deploy-check:
+    name: Pre-Deploy Snapshot
+    runs-on: ubuntu-latest
+    needs: [docker-verify]
+    outputs:
+      previous_deployment_id: ${{ steps.snapshot.outputs.deployment_id }}
+
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Capture Current Deployment ID
+        id: snapshot
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          DEPLOYMENT_ID=$(railway deployments list \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
+            --json 2>/dev/null | jq -r '.[0].id' 2>/dev/null || echo "none")
+          echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+          echo "Current production deployment: $DEPLOYMENT_ID"
+
+  # ─── Deploy to Production ────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Railway Production
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-check]
+    environment: production
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Production
+        id: deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway environment use production
+          railway up --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} --detach
+          echo "deploy_status=success" >> $GITHUB_OUTPUT
+
+      - name: Wait for Deployment Stabilization
+        run: |
+          echo "Waiting 90 seconds for deployment to stabilize..."
+          sleep 90
+
+      - name: Run Production Health Checks
+        id: health_check
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          PROD_URL=$(railway variables get RAILWAY_STATIC_URL \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} 2>/dev/null || echo "")
+          
+          if [ -n "$PROD_URL" ]; then
+            for i in 1 2 3; do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://$PROD_URL/health/")
+              echo "Attempt $i - Health check: $HTTP_STATUS"
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "health_status=healthy" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+              sleep 15
+            done
+            echo "health_status=unhealthy" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "health_status=unknown" >> $GITHUB_OUTPUT
+
+      - name: Automatic Rollback on Health Check Failure
+        if: failure() && needs.pre-deploy-check.outputs.previous_deployment_id != 'none'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          PREVIOUS_ID: ${{ needs.pre-deploy-check.outputs.previous_deployment_id }}
+        run: |
+          echo "🚨 Health check failed — initiating emergency rollback..."
+          railway deployments rollback $PREVIOUS_ID \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }}
+          echo "✅ Successfully rolled back to deployment: $PREVIOUS_ID"
+          exit 1
+
+      - name: Tag Successful Deployment
+        if: success()
+        run: |
+          git tag "deploy-production-$(date +%Y%m%d-%H%M%S)" || true
+          echo "🎉 Production deployment successful!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Time: $(date -u)"
