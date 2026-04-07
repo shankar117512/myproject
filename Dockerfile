@@ -34,14 +34,12 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
-RUN python manage.py collectstatic --noinput --settings=config.settings.production 2>/dev/null || true
+RUN python manage.py collectstatic --noinput --settings=config.settings.production
 
 RUN addgroup --system app && adduser --system --group app
 RUN chown -R app:app /app
 USER app
 
 EXPOSE 8000
-
-RUN python manage.py collectstatic --noinput
 
 CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"]
