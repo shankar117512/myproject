@@ -25,7 +25,7 @@ from api.views import home as api_home
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
-    path("health/", health_check, name="health_check"),
+    path("health/", views.health_check, name="health_check"),
     path("sentry-debug/", trigger_error),
     path("api/", include("api.urls")),
 ]

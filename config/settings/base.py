@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY', default='change-me-in-production')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['easygoing-analysis-production.up.railway.app', 'healthcheck.railway.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
