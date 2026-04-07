@@ -34,7 +34,9 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
-RUN python manage.py collectstatic --noinput --settings=config.settings.production
+ENV DATABASE_URL=postgresql://postgres:CNdgXtfbxvTJZRPGYLtqaIYOKaXLWIAu@gondola.proxy.rlwy.net:26358/railway
+
+RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
 
 RUN addgroup --system app && adduser --system --group app
 RUN chown -R app:app /app
