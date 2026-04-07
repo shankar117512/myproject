@@ -22,10 +22,14 @@ from config.views import home, health_check
 from config.views import trigger_error
 from api.views import home as api_home
 
+
+def health_check(request):
+    return HttpResponse("OK")
+
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
-    path("health/", views.health_check, name="health_check"),
+    path("health/", health_check, name="health-check"),
     path("sentry-debug/", trigger_error),
     path("api/", include("api.urls")),
 ]
