@@ -20,12 +20,12 @@ from django.contrib import admin
 from django.urls import path, include
 from config.views import home, health_check
 from config.views import trigger_error
-from api.views import home
+from api.views import home as api_home
 
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
-    path("health/", health_check),
+    path("health/", health_check, name="health_check"),
     path("sentry-debug/", trigger_error),
     path("api/", include("api.urls")),
 ]
