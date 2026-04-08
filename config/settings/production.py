@@ -1,11 +1,19 @@
 from .base import *
+import os
+import dj_database_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "easygoing-analysis-production.up.railway.app",
+    "healthcheck.railway.app",
+    "127.0.0.1",
+    "localhost",
+]
+CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-production.up.railway.app"]
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = True
@@ -16,7 +24,13 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+DATABASES = {
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,  # 👈 IMPORTANT FIX
+    )
+}
 
 SENTRY_DSN = config("SENTRY_DSN", default="")
 if SENTRY_DSN:
