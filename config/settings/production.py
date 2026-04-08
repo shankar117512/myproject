@@ -55,5 +55,3 @@ LOGGING = {
         "level": "WARNING",
     },
 }
-
-STATIC_ROOT = "/app/staticfiles"
