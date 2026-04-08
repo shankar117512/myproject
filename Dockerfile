@@ -34,6 +34,8 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
+RUN mkdir -p /app/staticfiles
+
 RUN python manage.py collectstatic --noinput --settings=config.settings.production 2>/dev/null || true
 
 RUN addgroup --system app && adduser --system --group app
