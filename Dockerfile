@@ -24,8 +24,7 @@ FROM python:3.11-slim AS runtime
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PYTHONUNBUFFERED=1 
 
 RUN apt-get update && apt-get install -y \
     libpq5 \
@@ -41,6 +40,6 @@ RUN addgroup --system app && adduser --system --group app
 RUN chown -R app:app /app
 USER app
 
-EXPOSE $PORT
+EXPOSE 8000
 
 CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"]
