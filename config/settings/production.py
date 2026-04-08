@@ -12,7 +12,8 @@ ALLOWED_HOSTS = ["stellar-wholeness-production1.up.railway.app"]
 CSRF_TRUSTED_ORIGINS = ["https://stellar-wholeness-production1.up.railway.app"]
 
 SECURE_BROWSER_XSS_FILTER = True
-SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = "DENY"
