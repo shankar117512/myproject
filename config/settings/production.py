@@ -5,7 +5,7 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = [".railway.app", config("PRODUCTION_DOMAIN", default="yourdomain.com")]
+ALLOWED_HOSTS = ["*"]
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = True
@@ -21,7 +21,7 @@ DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 SENTRY_DSN = config("SENTRY_DSN", default="")
 if SENTRY_DSN:
     sentry_sdk.init(
-        dsn=SENTRY_DSN,
+        dsn="https://bb4d49e6fe255d9b746a6afca468792f@o4511145511944192.ingest.us.sentry.io/4511145515876352",
         integrations=[DjangoIntegration()],
         environment="production",
         traces_sample_rate=0.1,
