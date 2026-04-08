@@ -5,7 +5,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["stellar-wholeness-production1.up.railway.app"]
 
