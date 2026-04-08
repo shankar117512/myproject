@@ -11,6 +11,9 @@ ALLOWED_HOSTS = ["stellar-wholeness-production1.up.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = ["https://stellar-wholeness-production1.up.railway.app"]
 
+# Static files fix for Railway
+WHITENOISE_USE_FINDERS = True
+
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = False
