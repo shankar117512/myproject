@@ -3,8 +3,7 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-ENV HOME=/tmp \
-    PYTHONDONTWRITEBYTECODE=1 \
+ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
@@ -34,6 +33,7 @@ RUN mkdir -p /app/staticfiles
 RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
 
 RUN addgroup --system app && adduser --system --group app
+ENV HOME=/tmp
 RUN chown -R app:app /app
 USER app
 
