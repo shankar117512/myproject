@@ -7,11 +7,9 @@ from decouple import config
 
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    "easygoing-analysis-production.up.railway.app",
-    "healthcheck.railway.app",
-]
-CSRF_TRUSTED_ORIGINS = ["https://easygoing-analysis-production.up.railway.app"]
+ALLOWED_HOSTS = ["stellar-wholeness-production1.up.railway.app"]
+
+CSRF_TRUSTED_ORIGINS = ["https://stellar-wholeness-production1.up.railway.app"]
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = True
