@@ -33,7 +33,8 @@ RUN mkdir -p /app/staticfiles
 RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
 
 RUN addgroup --system app && adduser --system --group app
-ENV HOME=/tmp && DATABASE_URL="postgresql://postgres:wNJoRxifNHtcLjSTbFfXmIZmomAbWDFi@switchyard.proxy.rlwy.net:39284/railway"
+ENV HOME=/tmp \
+    DATABASE_URL="postgresql://postgres:wNJoRxifNHtcLjSTbFfXmIZmomAbWDFi@switchyard.proxy.rlwy.net:39284/railway"
 RUN chown -R app:app /app
 USER app
 
