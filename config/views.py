@@ -20,5 +20,10 @@ def health_check(request):
     return JsonResponse({"status": "ok", "database": db_status})
 
 
+def test_home_view(client):
+    response = client.get("/")
+    assert response.status_code == 200
+
+
 def trigger_error(request):
     division_by_zero = 1 / 0

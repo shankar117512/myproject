@@ -8,6 +8,10 @@ class HealthCheckTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
+    def test_health_check_view(self):
+        response = self.client.get(reverse("health_check"))
+        self.assertEqual(response.status_code, 200)
+
     def test_health_check_returns_200(self):
         """Health endpoint must return 200 on healthy system."""
         response = self.client.get("/health/")
