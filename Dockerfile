@@ -4,7 +4,7 @@ FROM python:3.11-slim AS builder
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1i
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -33,7 +33,7 @@ RUN mkdir -p /app/staticfiles
 RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
 
 RUN addgroup --system app && adduser --system --group app
-ENV HOME=/tmp
+ENV HOME=/tmp && DATABASE_URL="postgresql://postgres:wNJoRxifNHtcLjSTbFfXmIZmomAbWDFi@switchyard.proxy.rlwy.net:39284/railway"
 RUN chown -R app:app /app
 USER app
 
