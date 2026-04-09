@@ -9,6 +9,13 @@ build/
 venv/
 env/
 .Python
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env
 
 # Django
 db.sqlite3
@@ -30,6 +37,9 @@ media/
 .vscode/
 .idea/
 *.swp
+
+# VS Code
+.vscode/
 
 # OS
 .DS_Store
