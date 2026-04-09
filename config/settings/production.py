@@ -26,7 +26,7 @@ SECURE_HSTS_PRELOAD = True
 
 DATABASES = {
     "default": dj_database_url.parse(
-        config("DATABASE_URL").strip(), conn_max_age=600, ssl_require=False
+        os.getenv("DATABASE_URL"), conn_max_age=600, ssl_require=True
     )
 }
 
