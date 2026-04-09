@@ -143,3 +143,5 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
 }
+
+PORT = int(os.environ.get("PORT", 8000))
