@@ -25,7 +25,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://postgres:wNJoRxifNHtcLjSTbFfXmIZmomAbWDFi@switchyard.proxy.rlwy.net:39284/railway
+      - DATABASE_URL=postgresql://postgres:MLIAWmPvgSdvKtFOYhGQZSMDMrvDHiKx@junction.proxy.rlwy.net:10990/railway
       - DJANGO_SETTINGS_MODULE=config.settings.production
     depends_on:
       db:
