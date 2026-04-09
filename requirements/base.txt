@@ -1,5 +1,5 @@
 Django==5.2.12
-djangorestframework==3.14.0
+djangorestframework==3.15.2
 psycopg2-binary==2.9.9
 gunicorn==25.3.0
 whitenoise==6.6.0
@@ -7,6 +7,6 @@ python-decouple==3.8
 dj-database-url==2.1.0
 django-cors-headers==4.3.1
 sentry-sdk==2.57.0
-coverage
-pytest
-pytest-django
+pytest==9.0.0
+pytest-django==4.12.0
+coverage==7.6.0
