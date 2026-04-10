@@ -157,7 +157,7 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway environment production
+          railway environment production1
           railway up --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} --detach
           echo "deploy_status=success" >> $GITHUB_OUTPUT
 
