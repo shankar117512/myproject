@@ -6,7 +6,7 @@ Django==5.2.12
 django-cors-headers==4.9.0
 djangorestframework==3.15.2
 filelock==3.25.2
-gunicorn==25.3.0
+gunicorn==25.4.0
 identify==2.6.18
 nodeenv==1.10.0
 packaging==26.0
