@@ -37,6 +37,8 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
+RUN ls -R
+
 RUN python manage.py collectstatic --noinput --settings=config.settings.production 2>/dev/null || true
 
 RUN mkdir -p /app && chmod -R 755 /app
